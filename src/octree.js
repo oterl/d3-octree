@@ -38,6 +38,37 @@ function leaf_copy(leaf) {
 
 var treeProto = octree.prototype = Octree.prototype;
 
+treeProto.serialize = function() {
+  return {
+    _x: this._x,
+    _y: this._y,
+    _z: this._z,
+    _y0: this._y0,
+    _z0: this._z0,
+    _x1: this._x1,
+    _y1: this._y1,
+    _z1: this._z1,
+    _root: this._root,
+  }
+};
+
+treeProto.deserialize = function(data) {
+  const tree = new Octree(
+    data._x,
+    data._y,
+    data._z,
+    data._x0,
+    data._y0,
+    data._z0,
+    data._x1,
+    data._y1,
+    data._z1
+  );
+
+  tree._root = data._root;
+  return tree
+};
+
 treeProto.copy = function() {
   var copy = new Octree(this._x, this._y, this._z, this._x0, this._y0, this._z0, this._x1, this._y1, this._z1),
       node = this._root,
@@ -52,7 +83,11 @@ treeProto.copy = function() {
   while (node = nodes.pop()) {
     for (var i = 0; i < 8; ++i) {
       if (child = node.source[i]) {
-        if (child.length) nodes.push({source: child, target: node.target[i] = new Array(8)});
+        if (child.length)
+          nodes.push({
+            source: child,
+            target: node.target[i] = new Array(8)
+          });
         else node.target[i] = leaf_copy(child);
       }
     }
